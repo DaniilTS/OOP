@@ -4,6 +4,6 @@ import Strategies.ReadyToAttackStrategy;
 public class HandStrategy implements ReadyToAttackStrategy {
     @Override
     public void readyToAttack(){
-        System.out.println("*hand swing sound sound*");
+        System.out.println("*hand swing sound*");
     }
 }
