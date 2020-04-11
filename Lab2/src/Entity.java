@@ -1,6 +1,8 @@
 import Strategies.*;
 import Strategies.ReadyToAttackCls.MagicStrategy;
 
+import java.lang.annotation.Documented;
+
 
 public class Entity {
 
@@ -11,8 +13,7 @@ public class Entity {
     private AttackStrategy attackStrategy;
     private ReadyToAttackStrategy readyToAttackStrategy;
 
-    public Entity(String name,
-                  int hp,int damadge,
+    public Entity(String name, int hp,int damadge,
                   GoStrategy goStrategy,
                   AttackStrategy attackStrategy,
                   ReadyToAttackStrategy readyToAttackStrategy){
@@ -63,5 +64,6 @@ public class Entity {
     public void setName(String name){
         this.name = name;
     }
+
 }
 
