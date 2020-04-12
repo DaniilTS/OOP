@@ -2,7 +2,9 @@ package Heroes;
 
 public interface Unit{
     void battleCry();
-    int getHP();
+
+    int getHp();
     int getArmor();
     int getPower();
+    String getName();
 }
