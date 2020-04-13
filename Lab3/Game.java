@@ -10,14 +10,16 @@ class Game {
         Squad squad2 = new Squad("Beta");
 
         squad1.addGroupOfUnits(new Elf("elf",5,5,5),50);
-        //squad1.battleMarch();
-        squad1.getStatus();
-        squad1.battleCry();
-        squad2.addGroupOfUnits(new Knight("knight",100,100,100),50);
+        squad1.setName("cats");
 
-        squad.addComponent(squad1);
-        squad.addComponent(squad2);
+        squad1.getStatus();
+
+        squad2.addGroupOfUnits(new Knight("knight",100,100,100),50);
+        squad2.getStatus();
+
+        squad.addUnit(squad1);
+        squad.addUnit(squad2);
+        squad.setArmor("cats",10);
         squad.getStatus();
-       // squad.battleCry();
     }
 }

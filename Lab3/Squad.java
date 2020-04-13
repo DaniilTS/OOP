@@ -13,15 +13,15 @@ class Squad implements Unit {
     private final List<Unit> units = new ArrayList<>();
     private final String squadName;
 
-    public void addComponent(Unit unit){
+    public void addUnit(Unit unit){
         units.add(unit);
     }
-    public void removeComponent(Unit unit){
+    public void removeUnit(Unit unit){
         units.remove(unit);
     }
     public void addGroupOfUnits(Unit unit,int numOfUnits){
         for (int i = 0; i < numOfUnits;i++){
-            addComponent(unit);
+            addUnit(unit);
         }
     }
     public int getNumOfUnitsInGroup(){
@@ -53,29 +53,51 @@ class Squad implements Unit {
 
         for (Unit unit: units){
             if(!names.contains(unit.getName())){
-                String asd = unit.getName();
                 names = names.concat(unit.getName()+" ");
             }
         }
         while(names.contains("  ")){
-            names = names.replaceAll("  ", " ");
+            names = names.replaceAll(" {2}", " ");
         }
         return names;
     }
-    public int getHp(){
+    public void setName(String name){
+        for (Unit unit: units){
+            unit.setName(name);
+        }
+    }
+
+    public double getHp(){
         int HP = 0;
         for (Unit unit: units){
             HP += unit.getHp();
         }
         return HP;
     }
-    public int getArmor(){
+    public void setHp(double hp){
+        for(Unit unit: units){
+            unit.setHp(hp);
+        }
+    }
+
+    public double getArmor(){
         int armor = 0;
         for (Unit unit: units){
             armor += unit.getArmor();
         }
         return armor;
     }
+    public void setArmor(double armor){
+        for(Unit unit: units){
+            unit.setArmor(armor);
+        }
+    }
+    public void setArmor(String name, double armor){
+        for (Unit unit: units){
+            unit.setArmor(name,armor);
+        }
+    }
+
     public double getPower(){
         float power = 0;
         for (Unit unit: units){
