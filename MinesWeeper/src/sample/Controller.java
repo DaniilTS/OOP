@@ -23,6 +23,10 @@ public class Controller {
 
     Image buttonPressed = new Image("sample/Images/closed.png");
     Image buttonReleased = new Image("sample/Images/opened.png");
+    Image closedCell = new Image("sample/Images/closed.png");
+    Image openedCell = new Image("sample/Images/opened.png");
+    Image flaggedCell = new Image("sample/Images/flaged.png");
+    Image bombedCell = new Image("sample/Images/bombed.png");
 
     @FXML
     private ResourceBundle resources;
@@ -41,8 +45,11 @@ public class Controller {
     public int numOfMines = 10;
     public int sizeOfImage = 25;
     boolean[][] grid = new boolean[n][m];
-    boolean[][] flags = new boolean[n][m];
+    boolean[][] flaged = new boolean[n][m];
+    boolean[][] opened = new boolean[n][m];
     ArrayList<Pair<Integer, Integer>> lst = new ArrayList<Pair<Integer, Integer>>();
+
+
 
     @FXML
     void initialize() {
@@ -55,25 +62,28 @@ public class Controller {
                 ImageView imageView = new ImageView();
                 imageView.setFitHeight(sizeOfImage);
                 imageView.setFitWidth(sizeOfImage);
-                Image image = new Image("/sample/Images/closed.png");
 
                 imageView.setOnMousePressed(mouseEvent -> {
 
-                    if(mouseEvent.getButton() == MouseButton.PRIMARY){
-                        Image newImage = new Image("/sample/Images/opened.png");
-                        imageView.setImage(newImage);
+                    int columnIndex = GridPane.getColumnIndex(imageView);
+                    int rowIndex = GridPane.getRowIndex(imageView);
 
+                    if(mouseEvent.getButton() == MouseButton.PRIMARY){
+
+                        imageView.setImage(openedCell);
+                        opened[columnIndex][rowIndex]=true;
                     }
                     else if(mouseEvent.getButton() == MouseButton.SECONDARY){
-                        
-                        Image newImage = new Image("/sample/Images/flaged.png");
-                        if(flags[GridPane.getColumnIndex(imageView)][GridPane.getRowIndex(imageView)]){
-                            imageView.setImage(new Image("/sample/Images/closed.png"));
-                            flags[GridPane.getColumnIndex(imageView)][GridPane.getRowIndex(imageView)] = false;
+
+                        if(flaged[columnIndex][rowIndex]&&(!opened[columnIndex][rowIndex])){
+
+                            imageView.setImage(closedCell);
+                            flaged[columnIndex][rowIndex] = false;
                         }
                         else{
-                            imageView.setImage(newImage);
-                            flags[GridPane.getColumnIndex(imageView)][GridPane.getRowIndex(imageView)] = true;
+
+                            imageView.setImage(flaggedCell);
+                            flaged[columnIndex][rowIndex] = true;
                         }
 
                     }
@@ -83,21 +93,25 @@ public class Controller {
 
                 imageView.setOnMouseReleased(mouseEvent -> {
 
+                    int columnIndex = GridPane.getColumnIndex(imageView);
+                    int rowIndex = GridPane.getRowIndex(imageView);
+
                     if(mouseEvent.getButton()== MouseButton.PRIMARY){
 
-                        if(grid[GridPane.getColumnIndex(imageView)][GridPane.getRowIndex(imageView)]){
+                        if(grid[columnIndex][rowIndex]){
                             openBombs();
                         }
                         else{
-                            Image newImage = new Image("/sample/Images/opened.png");
-                            imageView.setImage(newImage);
+
+                            imageView.setImage(openedCell);
+                            opened[columnIndex][rowIndex] = true;
                         }
                         imageView.setFitWidth(sizeOfImage);
                         imageView.setFitHeight(sizeOfImage);
                     }
                 });
 
-                imageView.setImage(image);
+                imageView.setImage(closedCell);
                 MyGrid.add(imageView,i,j);
             }
         }
@@ -111,7 +125,7 @@ public class Controller {
             int j = lst.get(0).getValue();
             ImageView imageView = (ImageView) getNodeFromGridPane(MyGrid,i,j);
             assert imageView != null;
-            imageView.setImage(new Image("/sample/Images/bombed.png"));
+            imageView.setImage(bombedCell);
             lst.remove(0);
         }
         MyGrid.setDisable(true);
@@ -133,6 +147,19 @@ public class Controller {
     public void mousePressed(MouseEvent mouseEvent) {
 
         MyImage.setImage(buttonReleased);
+        MyGrid.setDisable(false);
+        for (int i = 0;i<MyGrid.getRowCount();i++){
+            for(int j = 0;j<MyGrid.getColumnCount();j++){
+
+                grid[i][j] = opened[i][j] = flaged[i][j] = false;
+                ImageView imageView = (ImageView) getNodeFromGridPane(MyGrid,i,j);
+                assert imageView != null;
+                imageView.setImage(closedCell);
+            }
+        }
+        numOfMines = 10;
+        lst.clear();
+        placeBombs();
     }
 
     public void mouseReleased(MouseEvent mouseEvent) {
