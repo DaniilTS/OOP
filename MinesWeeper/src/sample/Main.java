@@ -14,6 +14,7 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         //scene.getStylesheets().add("viper.css");
         stage.setTitle("Minesweeper");
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
