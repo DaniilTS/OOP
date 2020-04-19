@@ -26,7 +26,7 @@ public class Controller {
     Image buttonReleased = new Image("sample/Images/opened.png");
     Image closedCell = new Image("sample/Images/base.png");
     Image openedCell = new Image("sample/Images/opened.png");
-    Image flaggedCell = new Image("sample/Images/flag.png");
+    Image flagedCell = new Image("sample/Images/flag.png");
     Image bombedCell = new Image("sample/Images/bombed.png");
 
     @FXML
@@ -79,20 +79,21 @@ public class Controller {
 
                     if(mouseEvent.getButton() == MouseButton.PRIMARY){
 
-                        imageView.setImage(openedCell);
-                        opened[columnIndex][rowIndex]=true;
+                        if(!opened[columnIndex][rowIndex]) {
+                            imageView.setImage(openedCell);
+                        }
                     }
                     else if(mouseEvent.getButton() == MouseButton.SECONDARY){
 
-                        if(flaged[columnIndex][rowIndex]&&(!opened[columnIndex][rowIndex])){
+                        if(!opened[columnIndex][rowIndex]&&flaged[columnIndex][rowIndex]){
 
                             imageView.setImage(closedCell);
-                            flaged[columnIndex][rowIndex] = false;
+                            flaged[columnIndex][rowIndex]=false;
                         }
-                        else{
+                        else if(!opened[columnIndex][rowIndex]){
 
-                            imageView.setImage(flaggedCell);
-                            flaged[columnIndex][rowIndex] = true;
+                            imageView.setImage(flagedCell);
+                            flaged[columnIndex][rowIndex]=true;
                         }
 
                     }
@@ -105,15 +106,16 @@ public class Controller {
                     int columnIndex = GridPane.getColumnIndex(imageView);
                     int rowIndex = GridPane.getRowIndex(imageView);
 
-                    if(mouseEvent.getButton()== MouseButton.PRIMARY){
+                    if(mouseEvent.getButton() == MouseButton.PRIMARY){
 
                         if(grid[columnIndex][rowIndex]){
                             openBombs();
                         }
-                        else{
+                        else if(!opened[columnIndex][rowIndex]){
                             imageView.setImage(chekArround(columnIndex,rowIndex));
                             opened[columnIndex][rowIndex] = true;
                         }
+
                         imageView.setFitWidth(sizeOfImage);
                         imageView.setFitHeight(sizeOfImage);
                     }
@@ -126,20 +128,9 @@ public class Controller {
     }
 
     private Image chekArround(int columnIndex, int rowIndex) {
-        int counter=0;
-        for(int i =-1;i<2;i++){
-            for(int j = -1;j<2;j++){
-                if((columnIndex-i>gameBoard.getBoardWidth())||(columnIndex-i<0)
-                        || (rowIndex-j>gameBoard.getBoardHeight())||(rowIndex-j<0)){
 
-                    continue;
-                }
-                if(grid[columnIndex-i][rowIndex-j]){
-                    counter++;
-                }
-            }
-        }
-        
+        int counter = circleRun(columnIndex,rowIndex);
+
         String url;
         switch (counter){
             case 1: url = "sample/Images/1.png";break;
@@ -150,7 +141,12 @@ public class Controller {
             case 6: url = "sample/Images/6.png";break;
             case 7: url = "sample/Images/7.png";break;
             case 8: url = "sample/Images/8.png";break;
-            default:url="sample/Images/opened.png";break;
+            default:{
+
+                url="sample/Images/opened.png";
+                
+                break;
+            }
         }
         return new Image(url);
     }
@@ -181,6 +177,23 @@ public class Controller {
                 numOfMines--;
             }
         }
+    }
+
+    private int circleRun(int columnIndex,int rowIndex){
+        int counter=0;
+        for(int i =-1;i<2;i++){
+            for(int j = -1;j<2;j++){
+                if((columnIndex-i>=gameBoard.getBoardWidth())||(columnIndex-i<0)
+                        || (rowIndex-j>=gameBoard.getBoardHeight())||(rowIndex-j<0)){
+
+                    continue;
+                }
+                if(grid[columnIndex-i][rowIndex-j]){
+                    counter++;
+                }
+            }
+        }
+        return counter;
     }
 
     public void gameRestart(MouseEvent mouseEvent) {
