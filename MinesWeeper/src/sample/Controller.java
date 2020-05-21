@@ -17,7 +17,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 import javafx.util.Pair;
 
 public class Controller extends Main{
@@ -50,12 +49,14 @@ public class Controller extends Main{
     private URL location;
 
     public int sizeOfImage = 25;
-    Image buttonPressed = new Image("sample/Images/closed.png");
     Image buttonReleased = new Image("sample/Images/opened.png");
     Image closedCell = new Image("sample/Images/base.png");
     Image openedCell = new Image("sample/Images/opened.png");
     Image flagedCell = new Image("sample/Images/flag.png");
     Image bombedCell = new Image("sample/Images/bombed.png");
+    Image whatCell = new Image("sample/Images/WHATSmile.png");
+    Image smileCell = new Image("sample/Images/smile.png");
+
     GameBoard gameBoard = new GameBoard(9,9,10);
 
     ArrayList<Pair<Integer, Integer>> lst = new ArrayList<Pair<Integer, Integer>>();
@@ -225,22 +226,47 @@ public class Controller extends Main{
         MyGrid.setPrefSize(width*25,height*25);
     }
 
-    public void gameRestart(MouseEvent mouseEvent) throws IOException {
+    public void gameRestartPressed(MouseEvent mouseEvent) throws IOException {
 
-        MyImage.setImage(buttonReleased);
+        MyImage.setImage(whatCell);
         MyGrid.setDisable(false);
         MyGrid.getChildren().clear();
         myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
     }
 
-    public void mousePressed(MouseEvent mouseEvent) throws IOException {
+    public void gameRestartReleased(MouseEvent mouseEvent) throws IOException {
 
-        gameBoard.setBoardHeight(Integer.parseInt(TextFieldForHeight.getText()));
-        gameBoard.setBoardWidth(Integer.parseInt(TextFieldForWidth.getText()));
-        gameBoard.setNumOfMines(Integer.parseInt(TextFieldForNumOfMines.getText()));
-        MyGrid.setDisable(false);
-        MyGrid.getChildren().clear();
-        myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
+        MyImage.setImage(smileCell);
+
+    }
+
+    public void mousePressed(MouseEvent mouseEvent) throws IOException {
+        if(TextFieldForHeight.getText().isEmpty() ||
+                TextFieldForWidth.getText().isEmpty() ||
+                TextFieldForNumOfMines.getText().isEmpty()){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Error");
+            alert.setContentText("Fill the fields!");
+            alert.showAndWait();
+            return;
+        }
+        int height = Integer.parseInt(TextFieldForHeight.getText());
+        int width = Integer.parseInt(TextFieldForWidth.getText());
+        int mines = Integer.parseInt(TextFieldForNumOfMines.getText());
+        if(height*width>mines){
+            gameBoard.setBoardHeight(Integer.parseInt(TextFieldForHeight.getText()));
+            gameBoard.setBoardWidth(Integer.parseInt(TextFieldForWidth.getText()));
+            gameBoard.setNumOfMines(Integer.parseInt(TextFieldForNumOfMines.getText()));
+            MyGrid.setDisable(false);
+            MyGrid.getChildren().clear();
+            myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
+        }
+        else{
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Error");
+            alert.setContentText("You have a lot of bombs!!!!");
+            alert.showAndWait();
+        }
     }
 
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
