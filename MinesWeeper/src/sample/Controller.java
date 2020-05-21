@@ -1,5 +1,6 @@
 package sample;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -16,40 +17,13 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 
-public class Controller {
+public class Controller extends Main{
 
     @FXML
-    private AnchorPane AnchorPane;
-
-    @FXML
-    public ImageView MyImage;
-
-    @FXML
-    private Button MyButton;
-
-    @FXML
-    public GridPane MyGrid;
-
-    Image buttonPressed = new Image("sample/Images/closed.png");
-    Image buttonReleased = new Image("sample/Images/opened.png");
-    Image closedCell = new Image("sample/Images/base.png");
-    Image openedCell = new Image("sample/Images/opened.png");
-    Image flagedCell = new Image("sample/Images/flag.png");
-    Image bombedCell = new Image("sample/Images/bombed.png");
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-    @FXML
-    private Button StartButton;
-
-    @FXML
-    private Button SettingsButton;
+    public AnchorPane anchorPane;
 
     @FXML
     private TextField TextFieldForHeight;
@@ -60,22 +34,39 @@ public class Controller {
     @FXML
     private TextField TextFieldForNumOfMines;
 
+    @FXML
+    public ImageView MyImage;
+
+    @FXML
+    private Button MyButton;
+
+    @FXML
+    public GridPane MyGrid;
+
+    @FXML
+    private ResourceBundle resources;
+
+    @FXML
+    private URL location;
+
     public int sizeOfImage = 25;
+    Image buttonPressed = new Image("sample/Images/closed.png");
+    Image buttonReleased = new Image("sample/Images/opened.png");
+    Image closedCell = new Image("sample/Images/base.png");
+    Image openedCell = new Image("sample/Images/opened.png");
+    Image flagedCell = new Image("sample/Images/flag.png");
+    Image bombedCell = new Image("sample/Images/bombed.png");
     GameBoard gameBoard = new GameBoard(9,9,10);
-    int startH = 9;
-    int startW = 9;
-    double c = 25.0/2.0;
 
     ArrayList<Pair<Integer, Integer>> lst = new ArrayList<Pair<Integer, Integer>>();
 
-
     @FXML
-    void initialize() {
+    void initialize() throws IOException {
         myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
     }
 
-    private Image chekArround(int columnIndex, int rowIndex,boolean[][] grid) {
-
+    private Image chekArround(int columnIndex, int rowIndex,boolean[][] grid,boolean[][] opened) {
+        opened[columnIndex][rowIndex] = true;
         int counter = circleRun(columnIndex,rowIndex,grid);
 
         String url;
@@ -88,11 +79,7 @@ public class Controller {
             case 6: url = "sample/Images/6.png";break;
             case 7: url = "sample/Images/7.png";break;
             case 8: url = "sample/Images/8.png";break;
-            default:{
-
-                url="sample/Images/opened.png";
-
-                break;
+            default:{ url="sample/Images/opened.png";break;
             }
         }
         return new Image(url);
@@ -113,10 +100,9 @@ public class Controller {
     }
 
     private void placeBombs(int numOfMines, boolean[][] grid,int height,int width){
-
         while(numOfMines>0){
-            int i = (int) (Math.random() * height);
-            int j = (int) (Math.random() * width);
+            int i = (int) (Math.random() * width);
+            int j = (int) (Math.random() * height);
             Pair<Integer, Integer> pair = new Pair<Integer, Integer>(i,j);
             if(!lst.contains(pair)){
                 lst.add(pair);
@@ -143,54 +129,24 @@ public class Controller {
         return counter;
     }
 
-    public void gameRestart(MouseEvent mouseEvent) {
-
-        MyImage.setImage(buttonReleased);
-        MyGrid.setDisable(false);
-        MyGrid.getChildren().clear();
-        myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
-    }
-
-    public void mouseReleased(MouseEvent mouseEvent) {
-        MyImage.setImage(new Image("sample/Images/smile.png"));
-    }
-
-    private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
-        for (Node node : gridPane.getChildren()) {
-            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
-                return node;
-            }
-        }
-        return null;
-    }
-
-    public void mousePressed(MouseEvent mouseEvent) {
-        gameBoard.setBoardHeight(9);
-        gameBoard.setBoardWidth(9);
-        gameBoard.setNumOfMines(0);
-        MyGrid.setDisable(false);
-        MyGrid.getChildren().clear();
-        myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
-    }
-
-    private void myInit(int height,int width, int numOfMines){
-
+    private void myInit(int height,int width, int numOfMines) throws IOException {
+        anchorPane.setMaxSize(300,300);
         AtomicInteger counter = new AtomicInteger(0);
         AtomicInteger dif = new AtomicInteger(height*width-numOfMines);
-        boolean[][] grid = new boolean[height][width];
-        boolean[][] flaged = new boolean[height][width];
-        boolean[][] opened = new boolean[height][width];
+        boolean[][] grid = new boolean[width][height];
+        boolean[][] flaged = new boolean[width][height];
+        boolean[][] opened = new boolean[width][height];
 
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
                 grid[i][j]=flaged[i][j]=opened[i][j]=false;
             }
         }
 
         placeBombs(numOfMines,grid,height,width);
 
-        for (int i = 0; i < height; i++){
-            for(int j = 0; j < width; j++){
+        for (int i = 0; i < width; i++){
+            for(int j = 0; j < height; j++){
 
                 ImageView imageView = new ImageView();
                 imageView.setFitHeight(sizeOfImage);
@@ -253,8 +209,7 @@ public class Controller {
                                 alert.showAndWait();
                             }
                             counter.getAndIncrement();
-                            imageView.setImage(chekArround(columnIndex,rowIndex,grid));
-                            opened[columnIndex][rowIndex] = true;
+                            imageView.setImage(chekArround(columnIndex,rowIndex,grid,opened));
                         }
 
                         imageView.setFitWidth(sizeOfImage);
@@ -266,6 +221,34 @@ public class Controller {
                 MyGrid.add(imageView,i,j);
             }
         }
-        MyGrid.setPrefSize(height*25,width*25);
+
+        MyGrid.setPrefSize(width*25,height*25);
+    }
+
+    public void gameRestart(MouseEvent mouseEvent) throws IOException {
+
+        MyImage.setImage(buttonReleased);
+        MyGrid.setDisable(false);
+        MyGrid.getChildren().clear();
+        myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
+    }
+
+    public void mousePressed(MouseEvent mouseEvent) throws IOException {
+
+        gameBoard.setBoardHeight(Integer.parseInt(TextFieldForHeight.getText()));
+        gameBoard.setBoardWidth(Integer.parseInt(TextFieldForWidth.getText()));
+        gameBoard.setNumOfMines(Integer.parseInt(TextFieldForNumOfMines.getText()));
+        MyGrid.setDisable(false);
+        MyGrid.getChildren().clear();
+        myInit(gameBoard.getBoardHeight(),gameBoard.getBoardWidth(),gameBoard.getNumOfMines());
+    }
+
+    private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                return node;
+            }
+        }
+        return null;
     }
 }
